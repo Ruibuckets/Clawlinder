@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" data-layout="sidebar" data-dock="right" data-view="week">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#496851">
+  <meta name="description" content="A personal calendar for your days, plans, and priorities. Customizable, private, and saved in your browser.">
+  <title>Clawlinder · Personal calendar</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script src="calendar-core.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to calendar</a>
+  <section id="sidebarIntro" class="sidebar-intro" aria-labelledby="introTitle">
+    <div class="intro-content">
+      <span class="eyebrow intro-eyebrow">A SMALL CALENDAR. A LITTLE MORE HEADSPACE.</span>
+      <h1 id="introTitle">Your day,<br><span>within reach.</span></h1>
+      <p class="intro-description">Keep your plans at the edge of your screen. Add a date, give it a priority, and get back to your day.</p>
+      <div class="intro-features"><span>Quick to open</span><span>Easy to make yours</span><span>A space of your own</span></div>
+      <div class="intro-actions"><button id="popoutButton" class="primary-button" type="button">Open sidebar window <span aria-hidden="true">↗</span></button><button id="fullPageButton" class="secondary-button" type="button">Full calendar</button></div>
+      <p class="intro-hint">A small window you can keep beside your work.</p>
+      <div class="intro-local"><span class="status-dot" aria-hidden="true"></span><span>Saved locally in your browser. No account needed.</span></div>
+    </div>
+    <div class="intro-decoration" aria-hidden="true"><span>✳</span><p>A little plan goes<br>a long way.</p></div>
+  </section>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Calendar tools">
+      <a class="brand" href="./" aria-label="Clawlinder home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M8 5v5M24 5v5M6 13h20"/><rect x="5" y="7" width="22" height="21" rx="5"/><path d="m11 21 3 3 7-8"/></svg></span>
+        <span>Clawlinder<span class="brand-subtitle">A little room for your days.</span></span>
+      </a>
+
+      <section class="clock-card" aria-label="Current date and time">
+        <span class="eyebrow">RIGHT HERE, RIGHT NOW</span>
+        <time id="liveClock" class="live-clock">--:--</time>
+        <p id="liveDate" class="live-date">Your local time</p>
+        <span class="timezone-note"><span class="status-dot" aria-hidden="true"></span> On your computer's time</span>
+      </section>
+
+      <button id="newEventButton" class="primary-button new-event-button" type="button"><span aria-hidden="true">＋</span> New event</button>
+
+      <nav class="sidebar-nav" aria-label="Calendar views">
+        <span class="eyebrow nav-label">YOUR SPACE</span>
+        <button id="viewWeek" class="nav-button" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18M7 15h4m-4 3h8"/></svg><span>7 days</span><span class="nav-arrow" aria-hidden="true">↗</span></button>
+        <button id="viewMonth" class="nav-button" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-12 0v10m6-10v10"/></svg><span>Month</span><span class="nav-arrow" aria-hidden="true">↗</span></button>
+        <button id="viewAgenda" class="nav-button" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3" cy="6" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="18" r="1"/></svg><span>Agenda</span><span class="nav-arrow" aria-hidden="true">↗</span></button>
+      </nav>
+
+      <section class="priority-key" aria-label="Importance level legend">
+        <span class="eyebrow">A PLACE FOR EVERY PRIORITY</span>
+        <div><span class="priority-dot" data-priority="urgent" aria-hidden="true"></span><span>Urgent</span><span class="priority-hint">Make it happen</span></div>
+        <div><span class="priority-dot" data-priority="high" aria-hidden="true"></span><span>High</span><span class="priority-hint">Keep in focus</span></div>
+        <div><span class="priority-dot" data-priority="normal" aria-hidden="true"></span><span>Normal</span><span class="priority-hint">On your radar</span></div>
+        <div><span class="priority-dot" data-priority="low" aria-hidden="true"></span><span>Low</span><span class="priority-hint">When there's room</span></div>
+      </section>
+
+      <div class="sidebar-footer">
+        <button id="settingsButton" class="nav-button" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2v3l2 2 3-1 2 3 3-1 1-3 3-1 1-3-2-2V6l-3-1-2 1-2-3Z"/><circle cx="12" cy="11" r="3"/></svg><span>Make it yours</span></button>
+        <button id="pinSidebarButton" class="pin-button text-button" type="button" aria-pressed="false" hidden>Keep on top</button>
+        <div class="data-actions" aria-label="Calendar backups">
+          <button id="exportButton" class="text-button" type="button">Back up</button>
+          <span aria-hidden="true">·</span>
+          <label class="text-button import-label" for="importInput">Restore<input id="importInput" class="visually-hidden" type="file" accept=".json,application/json"></label>
+          <span aria-hidden="true">·</span>
+          <button id="exportICSButton" class="text-button" type="button">Export .ics</button>
+        </div>
+        <div class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></svg><p id="storageStatus">Saved in this browser.<br>Your plans stay on this device.</p></div>
+      </div>
+    </aside>
+
+    <main id="mainContent" class="workspace" tabindex="-1">
+      <header class="workspace-header">
+        <div><span class="eyebrow">PLAN WITH A LITTLE INTENTION</span><h1 id="calendarName">My calendar</h1><p class="workspace-subtitle">Big plans. Small moments. All in one place.</p></div>
+        <div class="header-note"><span class="header-note-line" aria-hidden="true"></span><span>Your time,<br>your way.</span></div>
+      </header>
+
+      <div class="calendar-toolbar">
+        <div class="month-navigation">
+          <h2 id="monthLabel" aria-live="polite">Next 7 days</h2>
+          <div class="month-controls">
+            <button id="prevMonth" class="icon-button" type="button" aria-label="Previous month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+            <button id="nextMonth" class="icon-button" type="button" aria-label="Next month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
+          </div>
+        </div>
+        <div class="toolbar-end"><button id="sidebarViewButton" class="secondary-button" type="button">Sidebar <span aria-hidden="true">↗</span></button><button id="expandCalendarButton" class="text-button" type="button" aria-label="Open the full calendar">Full <span aria-hidden="true">↗</span></button><button id="todayButton" class="secondary-button" type="button">Today <span aria-hidden="true">↗</span></button></div>
+      </div>
+
+      <div class="filter-bar" aria-label="Find and filter events">
+        <div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><label class="visually-hidden" for="searchInput">Search events</label><input id="searchInput" type="search" placeholder="Find a plan, place, or thought…" autocomplete="off"></div>
+        <div class="filter-select"><label for="priorityFilter">Priority</label><select id="priorityFilter"><option value="all">All levels</option><option value="urgent">Urgent</option><option value="high">High</option><option value="normal">Normal</option><option value="low">Low</option></select></div>
+        <div class="filter-select"><label for="categoryFilter">Category</label><select id="categoryFilter"><option value="">All categories</option></select></div>
+      </div>
+
+      <div class="content-layout">
+        <section class="calendar-panel" aria-label="Calendar">
+          <div id="weekView" class="week-view">
+            <div class="week-heading"><h3>Your next 7 days</h3><p id="weekRange"></p></div>
+            <div id="weeklyDays" class="weekly-days"></div>
+          </div>
+          <div id="monthView" hidden>
+            <div id="weekdayLabels" class="weekday-labels" aria-hidden="true"></div>
+            <div id="calendarGrid" class="calendar-grid" aria-label="Month calendar"></div>
+          </div>
+          <div id="agendaView" class="agenda-view" hidden><div class="agenda-heading"><h3>A little further ahead</h3><p>Your events for this month, one day at a time.</p></div><div id="agendaList"></div></div>
+          <footer class="calendar-footer"><span id="statusSummary" aria-live="polite">Your writing saves automatically.</span><span class="calendar-tip">Pick a day to make a plan <span aria-hidden="true">↗</span></span></footer>
+        </section>
+
+        <aside class="day-panel" aria-label="Selected day's events">
+          <div class="panel-heading"><span class="eyebrow">A DAY IN YOUR LIFE</span><h2 id="selectedDateLabel">Selected day</h2><p id="daySummary">Space for what matters.</p></div>
+          <div id="dayEvents" class="day-event-list"></div>
+          <button id="addDayEvent" class="add-day-button" type="button"><span aria-hidden="true">＋</span> Add something to this day</button>
+          <div class="day-panel-note"><span aria-hidden="true">✳</span><p>A good day starts with<br>a little breathing room.</p></div>
+        </aside>
+      </div>
+      <footer class="workspace-footer"><span>Made for your everyday.</span><span>Local &amp; personal <span aria-hidden="true">✳</span></span></footer>
+    </main>
+  </div>
+
+  <dialog id="eventDialog" class="app-dialog" aria-labelledby="eventDialogTitle">
+    <form id="eventForm">
+      <div class="dialog-heading"><div><span class="eyebrow">MAKE A LITTLE PLAN</span><h2 id="eventDialogTitle">New event</h2></div><button id="eventCancel" class="icon-button" type="button" aria-label="Close event editor">×</button></div>
+      <p id="eventError" class="form-error" role="alert" hidden></p>
+      <input id="eventId" type="hidden">
+      <div class="form-field"><label for="eventTitle">What have you got planned?</label><input id="eventTitle" type="text" placeholder="Coffee with a friend, a big idea…" maxlength="120" required autocomplete="off"></div>
+      <div class="field-grid"><div class="form-field"><label for="eventDate">Date</label><input id="eventDate" type="date" required></div><div class="form-field all-day-field"><label class="checkbox-label" for="eventAllDay"><input id="eventAllDay" type="checkbox" checked><span>All day</span></label></div></div>
+      <div id="eventTimeFields" class="field-grid" hidden><div class="form-field"><label for="eventTime">Starts at</label><input id="eventTime" type="time" value="09:00"></div><div class="form-field"><label for="eventEndTime">Ends at <span class="optional-label">optional</span></label><input id="eventEndTime" type="time"></div></div>
+      <div class="field-grid"><div class="form-field"><label for="eventPriority">Importance</label><select id="eventPriority"><option value="low">Low · when there's room</option><option value="normal" selected>Normal · on your radar</option><option value="high">High · keep in focus</option><option value="urgent">Urgent · make it happen</option></select></div><div class="form-field"><label for="eventCategory">Category</label><select id="eventCategory"></select></div></div>
+      <div class="form-field"><label for="eventNotes">Notes <span class="optional-label">optional</span></label><textarea id="eventNotes" rows="3" maxlength="10000" placeholder="A place, a reminder, a detail you want to keep…"></textarea></div>
+      <div class="event-extras"><div class="color-field"><label for="eventColor">Event color</label><input id="eventColor" type="color" value="#496851" title="Choose an event color"></div><label class="checkbox-label" for="eventCompleted"><input id="eventCompleted" type="checkbox"><span>Mark as completed</span></label></div>
+      <div class="dialog-actions"><button id="deleteEventButton" class="danger-button" type="button" hidden>Delete event</button><button class="primary-button save-button" type="submit">Save event <span aria-hidden="true">↗</span></button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="app-dialog" aria-labelledby="settingsTitle">
+    <form id="settingsForm">
+      <div class="dialog-heading"><div><span class="eyebrow">YOUR CALENDAR, YOUR RULES</span><h2 id="settingsTitle">Make it yours</h2></div><button id="settingsCancel" class="icon-button" type="button" aria-label="Close settings">×</button></div>
+      <p id="settingsError" class="form-error" role="alert" hidden></p>
+      <div class="form-field"><label for="settingName">Calendar name</label><input id="settingName" type="text" required maxlength="60" placeholder="My calendar"></div>
+      <div class="field-grid"><div class="form-field"><label for="settingTheme">Appearance</label><select id="settingTheme"><option value="system">Follow my computer</option><option value="light">Light</option><option value="dark">Dark</option></select></div><div class="form-field"><label for="settingDensity">Calendar spacing</label><select id="settingDensity"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></div></div>
+      <div class="field-grid"><div class="form-field"><label for="settingWeekStart">Week starts on</label><select id="settingWeekStart"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></select></div><div class="form-field"><label for="settingTimeFormat">Time format</label><select id="settingTimeFormat"><option value="12">12-hour (2:30 PM)</option><option value="24">24-hour (14:30)</option></select></div></div>
+      <div class="form-field"><label for="settingDockSide">Screen side</label><select id="settingDockSide"><option value="right">Right side</option><option value="left">Left side</option></select><p class="field-help">Choose where your sidebar feels most at home.</p></div>
+      <div class="form-field"><label for="settingCategories">Your categories</label><textarea id="settingCategories" rows="2" maxlength="2460" placeholder="Personal, Work, Family, Health" aria-describedby="categoriesHelp"></textarea><p id="categoriesHelp" class="field-help">Separate categories with commas. Categories already used by events stay available.</p></div>
+      <div class="color-field settings-accent"><label for="settingAccent">Your accent color</label><input id="settingAccent" type="color" value="#496851" title="Choose the calendar accent color"></div>
+      <p class="settings-note">Changes apply to this browser. Back up your calendar to keep a copy or move it to another device.</p>
+      <div class="dialog-actions"><button class="primary-button save-button" type="submit">Save preferences <span aria-hidden="true">↗</span></button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

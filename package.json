@@ -1,0 +1,46 @@
+{
+  "name": "clawlinder",
+  "productName": "Clawlinder",
+  "version": "1.0.0",
+  "description": "A customizable personal calendar in a pinned desktop side window.",
+  "main": "desktop/main.cjs",
+  "author": "Clawlinder contributors",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "serve": "node serve.cjs",
+    "test": "node --test",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.clawlinder.calendar",
+    "productName": "Clawlinder",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "styles.css",
+      "calendar-core.js",
+      "app.js",
+      "icon.svg",
+      "icon-192.png",
+      "icon-512.png",
+      "manifest.webmanifest",
+      "sw.js",
+      "desktop/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "win": {
+      "target": "portable",
+      "artifactName": "Clawlinder-${version}-Windows-${arch}.${ext}"
+    }
+  }
+}

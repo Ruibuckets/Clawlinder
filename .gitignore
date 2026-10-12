@@ -1,0 +1,14 @@
+# Keep personal calendar exports outside the source repository.
+backups/
+*backup*.json
+*.ics
+
+# Local tools and operating-system files.
+node_modules/
+dist/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+Desktop.ini
