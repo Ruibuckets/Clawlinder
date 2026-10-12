@@ -51,9 +51,22 @@ jobs:
           - Editable events, importance levels, themes, custom categories, and backups.
           - **Ctrl+Shift+Space** shows or hides the running app.
 
-          Your plans stay on your own computer. Closing the app exits it; open its shortcut to use it again.
+          ## New in 1.1: importance-based reminders
 
-          This first release is unsigned, so Windows may show an unknown-publisher warning. SHA256SUMS.txt contains the download checksum.
+          | Importance | Notify before the event |
+          | --- | --- |
+          | Low | 24 hours |
+          | Normal | 48 and 24 hours |
+          | High | 72, 48, and 24 hours |
+          | Urgent | 7 days and 4 days |
+
+          Reminders use an event's start time; all-day events use 9 AM. Open **Make it yours → Reminders** to send a test notification, turn reminders off, or opt into **Start with Windows**. Startup is off by default. Blank daily writing spaces stay free-form; create an event for reminders.
+
+          Closing the window keeps the app in the system tray so reminders continue. Click its tray icon to reopen, or right-click → **Quit Clawlinder** to exit. Your computer must be awake and the app running. After downtime, only the latest missed reminder is sent for each event that has not started. Completed/deleted events do not notify.
+
+          **Updating from 1.0:** export a backup, close the old calendar, and run this installer. Existing plans stay in the same local profile. On version 1.1 or later, quit through the tray menu before updating.
+
+          Your plans stay on your own computer. This release is unsigned, so Windows may show an unknown-publisher warning. SHA256SUMS.txt contains the download checksum.
           '@ | Set-Content -LiteralPath dist/RELEASE_NOTES.md -Encoding utf8
           gh release create "v$version" $installer.FullName dist/SHA256SUMS.txt --draft --target $env:GITHUB_SHA --title "Clawlinder $version - Windows installer" --notes-file dist/RELEASE_NOTES.md
           if ($LASTEXITCODE -ne 0) { throw 'Could not create the draft release.' }
