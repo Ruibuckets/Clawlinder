@@ -198,7 +198,10 @@ test('package whitelists app resources and pins desktop dependencies', () => {
   assert.equal(pkg.main, 'desktop/main.cjs');
   assert.equal(pkg.devDependencies.electron, '44.7.0');
   assert.equal(pkg.devDependencies['electron-builder'], '26.15.3');
-  assert.equal(pkg.build.win.target, 'portable');
+  assert.deepEqual(pkg.build.win.target, ['nsis', 'portable']);
+  assert.equal(pkg.build.nsis.perMachine, false);
+  assert.equal(pkg.build.nsis.createDesktopShortcut, true);
+  assert.equal(pkg.build.nsis.createStartMenuShortcut, true);
   assert.equal(pkg.build.files.includes('tests/**/*'), false);
   assert.equal(pkg.build.files.includes('backups/**/*'), false);
   assert.equal(pkg.build.files.includes('desktop/**/*'), true);
