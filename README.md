@@ -2,6 +2,12 @@
 
 A customizable personal calendar for your computer, with a compact side window for easy access. It opens to seven blank daily planning spaces, starting today. The calendar uses plain HTML, CSS, and JavaScript; an optional Electron wrapper gives it a native desktop window that can stay above other apps. The browser version needs no packages or account.
 
+## Download and install on Windows
+
+Get the **Clawlinder Setup** executable from the [latest release](https://github.com/Ruibuckets/Clawlinder/releases/latest). Run it once, then open **Clawlinder** from your Start menu or desktop shortcut. The installed app runs independently of the terminal; you do not need Node.js or npm to use it.
+
+The download is for 64-bit Windows. This first release is unsigned, so Windows may display an unknown-publisher warning. Your calendar saves on your own computer.
+
 ## What you can do
 
 - Type directly into the next seven days, starting today, with a casual handwriting font and automatic local saving. On Sunday, the planner runs from Sunday through Saturday.
@@ -15,7 +21,7 @@ A customizable personal calendar for your computer, with a compact side window f
 
 Events cover one day each. Recurring events, device sync, accounts, and reminders while the app is closed are future features.
 
-## Run it on your computer
+## Run from source
 
 ### Desktop side window
 
@@ -67,7 +73,7 @@ The native desktop app has its own local storage, separate from your normal brow
 
 To install the app, first open the published HTTPS site or the local server and let it finish loading. In a supported browser such as Chrome or Edge, use the browser's install-app control or menu. Browser wording and availability vary. The installed app uses the same local data as the corresponding site.
 
-## Build a portable Windows app
+## Build the Windows installer and portable app
 
 On Windows, after `npm install`, run:
 
@@ -75,7 +81,7 @@ On Windows, after `npm install`, run:
 npm run dist
 ```
 
-The builder produces a portable `.exe` inside `dist/` that you can launch without an installer. The first build may download packaging tools. This project includes the build configuration; a built executable is not included. The build is unsigned unless you configure code signing. Keep build outputs out of the source repository; if you distribute one later, attach it to a GitHub release.
+The builder produces a **Clawlinder Setup** installer and a portable `.exe` inside `dist/`. The installer adds Start menu and desktop shortcuts, so launching the installed app needs no terminal. The first build may download packaging tools. Builds are unsigned unless you configure code signing. Keep build outputs out of the source repository; distribute them as GitHub release assets.
 
 ## Publish on GitHub: browser method
 
@@ -136,7 +142,7 @@ Run all included checks with Node.js; this does not require installing Electron:
 node --test
 ```
 
-These tests check calendar logic and simulate the browser UI and native wrapper, including seven-day date rollovers, typing and restoring daily plans, event editing, storage, imports, layout controls, dock/pin actions, sender validation, the shortcut, and single-instance behavior. A simulated UI check does not replace verifying rendering and keyboard behavior in a real browser. The Windows executable has not been built.
+These tests check calendar logic and simulate the browser UI and native wrapper, including seven-day date rollovers, typing and restoring daily plans, event editing, storage, imports, layout controls, dock/pin actions, sender validation, the shortcut, and single-instance behavior. A simulated UI check does not replace verifying rendering and keyboard behavior in a real browser.
 
 Useful next projects are recurring events, drag-to-move scheduling, and an optional sync service. These need additional design and code; they are not included in this version. GitHub Pages hosts the browser version; GitHub stores the desktop source, which you run or package locally.
 

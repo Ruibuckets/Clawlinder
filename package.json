@@ -11,7 +11,7 @@
     "start": "electron .",
     "serve": "node serve.cjs",
     "test": "node --test",
-    "dist": "electron-builder --win portable"
+    "dist": "electron-builder --win --x64"
   },
   "devDependencies": {
     "electron": "44.7.0",
@@ -21,6 +21,7 @@
     "appId": "com.clawlinder.calendar",
     "productName": "Clawlinder",
     "asar": true,
+    "npmRebuild": false,
     "directories": {
       "output": "dist"
     },
@@ -39,8 +40,17 @@
       "LICENSE"
     ],
     "win": {
-      "target": "portable",
+      "target": ["nsis", "portable"],
+      "icon": "icon.ico",
       "artifactName": "Clawlinder-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Clawlinder",
+      "artifactName": "Clawlinder-Setup-${version}-Windows-${arch}.${ext}"
     }
   }
 }
