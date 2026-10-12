@@ -146,6 +146,7 @@ function launch(storage = new Map(), dark = false, options = {}) {
   const media = new Node('media');
   media.matches = dark;
   const window = new Node('window');
+  if (options.desktop) window.desktopCalendar = options.desktop;
   let confirmations = 0;
   window.matchMedia = () => media;
   window.confirm = () => { confirmations += 1; return true; };
@@ -185,6 +186,46 @@ function launch(storage = new Map(), dark = false, options = {}) {
   };
   function $(id) { return document.getElementById(id); }
 }
+
+test('desktop UI syncs events and notification preferences, while free text stays outside reminders', async () => {
+  const calls = [];
+  const startup = [];
+  let atLogin = false;
+  const status = () => ({ supported: true, startupSupported: true, startAtLogin: atLogin, error: '' });
+  const desktop = {
+    setDockSide: async () => true, setPinned: async () => true,
+    syncReminders: async (snapshot) => { calls.push(JSON.parse(JSON.stringify(snapshot))); return status(); },
+    reminderStatus: async () => status(),
+    testNotification: async () => true,
+    setStartAtLogin: async (value) => { startup.push(value); atLogin = value; return true; },
+  };
+  const app = launch(new Map(), false, { desktop });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(app.$('desktopReminderSettings').hidden, false);
+  assert.equal(app.$('browserReminderHelp').hidden, true);
+  assert.equal(calls[0].enabled, true);
+  const writing = find(app.$('weeklyDays'), (node) => node.tagName === 'textarea');
+  writing.value = '7 PM study SAT';
+  await writing.emit('input');
+  assert.equal(calls.length, 1);
+  await app.$('newEventButton').click();
+  app.$('eventTitle').value = 'Study SAT';
+  app.$('eventPriority').value = 'urgent';
+  await app.$('eventPriority').emit('change');
+  assert.match(app.$('eventReminders').textContent, /7 days and 4 days/);
+  await app.$('eventForm').emit('submit');
+  assert.equal(calls.at(-1).events[0].priority, 'urgent');
+  await app.$('settingsButton').click();
+  await new Promise((resolve) => setImmediate(resolve));
+  app.$('settingNotifications').checked = false;
+  app.$('settingStartAtLogin').checked = true;
+  await app.$('settingsForm').emit('submit');
+  assert.equal(app.saved().settings.notifications, false);
+  assert.equal(calls.at(-1).enabled, false);
+  assert.deepEqual(startup, [true]);
+  await app.$('testNotificationButton').click();
+  assert.match(app.$('toast').textContent, /Test notification sent/);
+});
 
 test('app adds, marks done, edits, reloads, and deletes a persisted event', async () => {
   let app = launch();
