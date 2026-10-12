@@ -20,6 +20,7 @@
     timeFormat: '24',
     density: 'comfortable',
     dockSide: 'right',
+    notifications: true,
     categories: Object.freeze(['Personal', 'Work', 'Study', 'Health'])
   });
 
@@ -212,6 +213,7 @@
       if (!['left', 'right'].includes(input.dockSide)) throw new Error('Sidebar position must be left or right.');
       settings.dockSide = input.dockSide;
     }
+    if (has(input, 'notifications')) settings.notifications = validBoolean(input.notifications, 'Notifications');
     if (has(input, 'categories')) {
       if (!Array.isArray(input.categories) || input.categories.length < 1 || input.categories.length > 30) {
         throw new Error('Use between 1 and 30 categories.');

@@ -128,6 +128,7 @@
       <div class="field-grid"><div class="form-field"><label for="eventDate">Date</label><input id="eventDate" type="date" required></div><div class="form-field all-day-field"><label class="checkbox-label" for="eventAllDay"><input id="eventAllDay" type="checkbox" checked><span>All day</span></label></div></div>
       <div id="eventTimeFields" class="field-grid" hidden><div class="form-field"><label for="eventTime">Starts at</label><input id="eventTime" type="time" value="09:00"></div><div class="form-field"><label for="eventEndTime">Ends at <span class="optional-label">optional</span></label><input id="eventEndTime" type="time"></div></div>
       <div class="field-grid"><div class="form-field"><label for="eventPriority">Importance</label><select id="eventPriority"><option value="low">Low · when there's room</option><option value="normal" selected>Normal · on your radar</option><option value="high">High · keep in focus</option><option value="urgent">Urgent · make it happen</option></select></div><div class="form-field"><label for="eventCategory">Category</label><select id="eventCategory"></select></div></div>
+      <p id="eventReminders" class="field-help" aria-live="polite"></p>
       <div class="form-field"><label for="eventNotes">Notes <span class="optional-label">optional</span></label><textarea id="eventNotes" rows="3" maxlength="10000" placeholder="A place, a reminder, a detail you want to keep…"></textarea></div>
       <div class="event-extras"><div class="color-field"><label for="eventColor">Event color</label><input id="eventColor" type="color" value="#496851" title="Choose an event color"></div><label class="checkbox-label" for="eventCompleted"><input id="eventCompleted" type="checkbox"><span>Mark as completed</span></label></div>
       <div class="dialog-actions"><button id="deleteEventButton" class="danger-button" type="button" hidden>Delete event</button><button class="primary-button save-button" type="submit">Save event <span aria-hidden="true">↗</span></button></div>
@@ -144,6 +145,16 @@
       <div class="form-field"><label for="settingDockSide">Screen side</label><select id="settingDockSide"><option value="right">Right side</option><option value="left">Left side</option></select><p class="field-help">Choose where your sidebar feels most at home.</p></div>
       <div class="form-field"><label for="settingCategories">Your categories</label><textarea id="settingCategories" rows="2" maxlength="2460" placeholder="Personal, Work, Family, Health" aria-describedby="categoriesHelp"></textarea><p id="categoriesHelp" class="field-help">Separate categories with commas. Categories already used by events stay available.</p></div>
       <div class="color-field settings-accent"><label for="settingAccent">Your accent color</label><input id="settingAccent" type="color" value="#496851" title="Choose the calendar accent color"></div>
+      <fieldset id="desktopReminderSettings" class="reminder-settings" hidden>
+        <legend>Reminders</legend>
+        <label class="checkbox-label" for="settingNotifications"><input id="settingNotifications" type="checkbox" checked><span>Notify me about upcoming events</span></label>
+        <p class="field-help">Low: 1 day before · Normal: 2 and 1 · High: 3, 2, and 1 · Urgent: 7 and 4. All-day events use 9:00 AM.</p>
+        <label class="checkbox-label" for="settingStartAtLogin"><input id="settingStartAtLogin" type="checkbox" disabled><span>Start with Windows, quietly in the tray</span></label>
+        <p class="field-help">Reminders need your computer awake and Clawlinder running. After sleep or a restart, you receive the latest missed reminder for each upcoming event.</p>
+        <p id="reminderStatus" class="field-help" role="status">Loading reminder settings…</p>
+        <button id="testNotificationButton" class="secondary-button" type="button">Send a test notification</button>
+      </fieldset>
+      <p id="browserReminderHelp" class="field-help">Install Clawlinder on Windows for importance-based reminders.</p>
       <p class="settings-note">Changes apply to this browser. Back up your calendar to keep a copy or move it to another device.</p>
       <div class="dialog-actions"><button class="primary-button save-button" type="submit">Save preferences <span aria-hidden="true">↗</span></button></div>
     </form>

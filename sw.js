@@ -1,5 +1,5 @@
 /* Cache only public application files. Event data stays in browser localStorage. */
-const CACHE = 'clawlinder-v4';
+const CACHE = 'clawlinder-v5';
 const ASSETS = ['./', './index.html', './styles.css', './calendar-core.js', './app.js', './icon.svg', './icon-192.png', './icon-512.png', './manifest.webmanifest'];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));

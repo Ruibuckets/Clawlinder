@@ -1,7 +1,7 @@
 {
   "name": "clawlinder",
   "productName": "Clawlinder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A customizable personal calendar in a pinned desktop side window.",
   "main": "desktop/main.cjs",
   "author": "Clawlinder contributors",
@@ -40,7 +40,10 @@
       "LICENSE"
     ],
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "icon.ico",
       "artifactName": "Clawlinder-${version}-Windows-${arch}.${ext}"
     },

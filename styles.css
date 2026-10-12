@@ -380,3 +380,7 @@ input::placeholder, textarea::placeholder { color: var(--muted); opacity: .8; }
 @media print { .sidebar, .workspace-header, .filter-bar, .month-controls, #todayButton, .day-panel, .workspace-footer, .calendar-tip, .event-actions { display: none; } .app-shell { display: block; } .workspace { padding: 0; max-width: none; } .content-layout { display: block; } .calendar-panel { box-shadow: none; } body { background: white; color: black; } .day-cell { min-height: 100px; break-inside: avoid; } }
 @media print { [data-layout="sidebar"] body { display: block; height: auto; overflow: visible; } [data-layout="sidebar"] .sidebar-intro, [data-layout="sidebar"] .sidebar, .toolbar-end { display: none; } [data-layout="sidebar"] .app-shell { width: 100%; height: auto; overflow: visible; border: 0; box-shadow: none; } [data-layout="sidebar"] .workspace { padding: 0; } [data-layout="sidebar"] .content-layout { display: block; } [data-layout="sidebar"] .day-panel { display: none; } [data-layout="sidebar"] .day-cell { min-height: 80px; } }
 @media print { .week-plan { break-inside: avoid; } .week-plan-input { resize: none; } }
+.reminder-settings { margin: 22px 0 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; min-width: 0; }
+.reminder-settings legend { padding: 0 6px; font-weight: 600; }
+.reminder-settings .checkbox-label { margin: 8px 0; }
+.reminder-settings .field-help { line-height: 1.65; }

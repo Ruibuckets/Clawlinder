@@ -6,20 +6,38 @@ A customizable personal calendar for your computer, with a compact side window f
 
 Get the **Clawlinder Setup** executable from the [latest release](https://github.com/Ruibuckets/Clawlinder/releases/latest). Run it once, then open **Clawlinder** from your Start menu or desktop shortcut. The installed app runs independently of the terminal; you do not need Node.js or npm to use it.
 
-The download is for 64-bit Windows. This first release is unsigned, so Windows may display an unknown-publisher warning. Your calendar saves on your own computer.
+The download is for 64-bit Windows. Releases are unsigned, so Windows may display an unknown-publisher warning. Your calendar saves on your own computer. To update, quit the old app first (use its tray menu on version 1.1 or later), then run the new installer. Your saved calendar stays in the same profile. Export a backup before updating.
 
 ## What you can do
 
 - Type directly into the next seven days, starting today, with a casual handwriting font and automatic local saving. On Sunday, the planner runs from Sunday through Saturday.
 - Write schedules in your own words, such as `7:00pm- 9:00pm, study SAT`, with multiple lines per day.
 - Add, edit, delete, and complete events with a date, start/end time or all-day option, notes, category, color, and importance level.
+- Receive native Windows reminders based on an event's importance. The app keeps running in the system tray when you close its window.
 - Switch between the seven-day planner, month calendar, and agenda; see today's date and a live clock.
 - Search events and filter them by importance and category.
 - Customize your calendar name, light/dark/system theme, accent color, week start, clock format, display density, screen side, and categories.
 - Export a JSON backup containing daily plans, events, and settings; restore a JSON backup; or export structured events as an `.ics` calendar file.
 - Use the installed app offline after its first successful load through a local server or HTTPS.
 
-Events cover one day each. Recurring events, device sync, accounts, and reminders while the app is closed are future features.
+Events cover one day each. Recurring events, device sync, and accounts are future features.
+
+## Importance-based reminders (desktop version)
+
+| Importance | Notify before the event |
+| --- | --- |
+| Low | 24 hours |
+| Normal | 48 hours and 24 hours |
+| High | 72 hours, 48 hours, and 24 hours |
+| Urgent | 7 days (168 hours) and 4 days (96 hours) |
+
+Reminders use the event's local start time. All-day events use **9:00 AM** on their date as the reference time. Each reminder day is exactly 24 hours, including across daylight-saving changes. Completed or deleted events do not notify; editing their date, time, or importance updates the pending schedule.
+
+Open **Make it yours → Reminders** to turn reminders on/off, send a test notification, or enable **Start with Windows**. Startup is optional and off by default; it opens the installed app quietly in the tray. It is unavailable in source runs and the portable executable. Click a notification or tray icon to open the calendar. Right-click the tray icon and choose **Quit Clawlinder** to fully exit.
+
+Your computer must be awake and Clawlinder must be running, including in the tray. Windows notification settings and Do Not Disturb can suppress banners. After sleep or downtime, the app sends only the latest missed reminder for each event that has not started, avoiding a burst of old milestones. Previously sent reminders stay recorded across restarts. Events added after their reminder time get the latest applicable reminder once.
+
+The blank daily writing boxes do not become events. Use **New event** for a reminder with importance. Reminders work in the desktop app, not the browser version. The calendar and reminder history stay on your computer; no server or account is required.
 
 ## Run from source
 
@@ -36,7 +54,7 @@ The first command downloads the desktop dependencies; later launches need only `
 
 After updating the source files, close and reopen the desktop app with `npm start`. This planner update does not require reinstalling dependencies. Existing events and settings remain in local storage.
 
-Press `Ctrl+Shift+Space` to hide or show the running calendar (`Command+Shift+Space` on macOS). The shortcut works only while the desktop app is running and can be unavailable if another app has registered it. Closing the window exits the app. It does not start automatically when your computer starts.
+Press `Ctrl+Shift+Space` to hide or show the running calendar (`Command+Shift+Space` on macOS). The shortcut works only while the desktop app is running and can be unavailable if another app has registered it. Closing the window hides it to the system tray so reminders continue. Use **Quit Clawlinder** in the tray menu to exit. It starts with Windows only if you enable that option.
 
 Desktop dependencies are pinned to [Electron 44.7.0](https://releases.electronjs.org/) and [electron-builder 26.15.3](https://www.npmjs.com/package/electron-builder?activeTab=versions), checked on October 12, 2026.
 
@@ -128,10 +146,12 @@ git push
 | `sw.js` | Offline caching; change its cache version when cached app files change |
 | `serve.cjs` | Optional local preview server |
 | `desktop/main.cjs` | Native window size, screen-edge positioning, pin behavior, and shortcut |
-| `desktop/preload.cjs` | Small bridge that lets the calendar choose its dock side and pin state |
+| `desktop/reminders.cjs` | Importance schedules, reminder timing, validation, and persistent delivery history |
+| `desktop/preload.cjs` | Limited bridge for docking, pinning, reminders, testing, and optional startup |
 | `package.json` | Desktop dependencies, launch commands, and portable Windows build settings |
 | `tests/core.test.cjs` | Automated checks for calendar logic |
 | `tests/desktop-wrapper.test.cjs` | Simulated native window, shortcut, and IPC behavior |
+| `tests/reminders.test.cjs` | Milestones, daylight saving, restart recovery, edits, cancellation, and duplicate prevention |
 | `tests/ui-smoke.test.cjs` | Simulated browser UI, storage, forms, imports, and layout controls |
 
 Start by changing labels or CSS and refreshing the page. For a new event field, add an input in `index.html`, save/read it in `app.js`, and update validation and backup handling in `calendar-core.js`. Try changes with a few test events and check that exporting and importing preserves them.

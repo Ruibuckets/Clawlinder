@@ -16,6 +16,41 @@
   const mediaTheme = window.matchMedia('(prefers-color-scheme: dark)');
   const weeklyCards = new Map();
   let weekSignature = '';
+  let lastReminderSync = '';
+  let desktopStatus = null;
+
+  function showReminderStatus(status) {
+    desktopStatus = status;
+    $('reminderStatus').textContent = status.error || (!status.supported
+      ? 'Desktop notifications are unavailable on this system.'
+      : 'Closing the window keeps reminders running in the system tray. Right-click its icon to quit.');
+    $('settingNotifications').disabled = !status.supported;
+    $('testNotificationButton').disabled = !status.supported;
+    $('settingStartAtLogin').disabled = !status.startupSupported;
+  }
+
+  function syncDesktopReminders() {
+    if (!window.desktopCalendar || !window.desktopCalendar.syncReminders) return;
+    const snapshot = { enabled: !state.storageBlocked && state.storageAvailable && state.settings.notifications,
+      timeFormat: state.settings.timeFormat, events: state.storageBlocked ? [] : state.events };
+    const signature = JSON.stringify(snapshot);
+    if (signature === lastReminderSync) return;
+    lastReminderSync = signature;
+    window.desktopCalendar.syncReminders(snapshot).then((status) => {
+      if (!status) throw new Error('Reminder update rejected.');
+      showReminderStatus(status);
+    }).catch(() => {
+      lastReminderSync = '';
+      notify('Could not update desktop reminders. Reopen Clawlinder and try again.');
+    });
+  }
+
+  function showEventReminders() {
+    const schedules = { low: '1 day', normal: '2 days and 1 day', high: '3, 2, and 1 day', urgent: '7 days and 4 days' };
+    $('eventReminders').textContent = !window.desktopCalendar ? 'Install the desktop app for importance-based reminders.'
+      : !state.settings.notifications ? 'Reminders are turned off in Make it yours.'
+      : `Reminders: ${schedules[$('eventPriority').value]} before. Each day is 24 hours.${$('eventAllDay').checked ? ' All-day reminders use 9:00 AM on the event date.' : ''}`;
+  }
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -84,10 +119,12 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(backup()));
       state.storageAvailable = true;
       showStorageStatus();
+      syncDesktopReminders();
       return true;
     } catch (error) {
       state.storageAvailable = false;
       showStorageStatus();
+      syncDesktopReminders();
       notify('Changes could not be saved in this browser. Export a backup before closing.');
       return false;
     }
@@ -363,6 +400,7 @@
     $('eventTime').required = !allDay;
     $('eventEndTime').disabled = allDay;
     $('eventEndTime').min = !allDay ? $('eventTime').value : '';
+    showEventReminders();
   }
 
   function openEvent(event) {
@@ -440,10 +478,18 @@
     $('settingDensity').value = settings.density;
     $('settingDockSide').value = settings.dockSide;
     $('settingCategories').value = settings.categories.join(', ');
+    $('settingNotifications').checked = settings.notifications;
+    if (window.desktopCalendar && window.desktopCalendar.reminderStatus) {
+      window.desktopCalendar.reminderStatus().then((status) => {
+        if (!status) return;
+        showReminderStatus(status);
+        $('settingStartAtLogin').checked = status.startAtLogin;
+      }).catch(() => notify('Could not read reminder settings.'));
+    }
     $('settingsDialog').showModal();
   }
 
-  function saveSettings(event) {
+  async function saveSettings(event) {
     event.preventDefault();
     $('settingsError').hidden = true;
     try {
@@ -452,8 +498,15 @@
         accent: $('settingAccent').value, weekStart: Number($('settingWeekStart').value),
         timeFormat: $('settingTimeFormat').value, density: $('settingDensity').value,
         dockSide: $('settingDockSide').value,
+        notifications: $('settingNotifications').checked,
         categories: [...new Set($('settingCategories').value.split(',').map((value) => value.trim()).filter(Boolean))],
       });
+      if (desktopStatus && desktopStatus.startupSupported &&
+          $('settingStartAtLogin').checked !== desktopStatus.startAtLogin) {
+        const changed = await window.desktopCalendar.setStartAtLogin($('settingStartAtLogin').checked);
+        if (!changed) throw new Error('Could not change Start with Windows. Please try again.');
+        desktopStatus.startAtLogin = $('settingStartAtLogin').checked;
+      }
       state.settings = settings;
       const saved = persist();
       applySettings();
@@ -520,6 +573,7 @@
     $('eventCancel').addEventListener('click', () => $('eventDialog').close());
     $('eventAllDay').addEventListener('change', syncTimeFields);
     $('eventTime').addEventListener('change', syncTimeFields);
+    $('eventPriority').addEventListener('change', showEventReminders);
     $('deleteEventButton').addEventListener('click', () => {
       const id = $('eventId').value;
       const event = state.events.find((item) => item.id === id);
@@ -549,6 +603,16 @@
     $('settingsButton').addEventListener('click', openSettings);
     $('settingsCancel').addEventListener('click', () => $('settingsDialog').close());
     $('settingsForm').addEventListener('submit', saveSettings);
+    $('testNotificationButton').addEventListener('click', async () => {
+      const button = $('testNotificationButton');
+      button.disabled = true;
+      try {
+        const shown = await window.desktopCalendar.testNotification();
+        notify(shown ? 'Test notification sent. Check your Windows notifications.'
+          : 'Notification could not be shown. Check Windows Settings → System → Notifications → Clawlinder.');
+      } catch { notify('Could not send the test notification.'); }
+      finally { button.disabled = false; }
+    });
     $('exportButton').addEventListener('click', () => {
       download(`clawlinder-backup-${today()}.json`, JSON.stringify(backup(), null, 2), 'application/json');
       notify('Backup exported. Keep it somewhere safe.');
@@ -571,6 +635,8 @@
     $('sidebarViewButton').addEventListener('click', () => setLayout('sidebar'));
     if (window.desktopCalendar) {
       document.documentElement.dataset.desktop = 'true';
+      $('desktopReminderSettings').hidden = false;
+      $('browserReminderHelp').hidden = true;
       $('pinSidebarButton').hidden = false;
       $('pinSidebarButton').setAttribute('aria-pressed', 'true');
       $('pinSidebarButton').addEventListener('click', async () => {
@@ -600,6 +666,7 @@
           }
         }
         state.settings = saved.settings;
+        syncDesktopReminders();
         applySettings();
         render();
         if ($('eventDialog').open || $('settingsDialog').open) reportError('Calendar updated in another window. Your open form is preserved; saving will apply your edits.');
@@ -612,6 +679,7 @@
   bind();
   applySettings();
   render();
+  syncDesktopReminders();
   setInterval(updateClock, 1000);
   if ('serviceWorker' in navigator && ['http:', 'https:'].includes(location.protocol)) {
     navigator.serviceWorker.register('./sw.js').catch(() => {
