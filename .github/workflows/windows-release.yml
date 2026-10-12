@@ -1,0 +1,59 @@
+name: Build Windows installer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check the calendar
+        run: npm test
+      - name: Build installer and portable app
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run dist -- --publish never
+      - name: Prepare draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          $installer = Get-Item "dist/Clawlinder-Setup-$version-Windows-x64.exe"
+          $hash = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $($installer.Name)" | Set-Content -LiteralPath dist/SHA256SUMS.txt -Encoding ascii
+          @'
+          ## Install Clawlinder
+
+          Download the Clawlinder Setup executable below and run it once. Then open **Clawlinder** from your Start menu or desktop shortcut.
+
+          **No Node.js, npm, or open terminal is required.** This release is for 64-bit Windows.
+
+          - A compact sidebar with left/right docking and a keep-on-top control.
+          - Seven blank writing spaces, starting today, with a casual font and local autosave.
+          - Editable events, importance levels, themes, custom categories, and backups.
+          - **Ctrl+Shift+Space** shows or hides the running app.
+
+          Your plans stay on your own computer. Closing the app exits it; open its shortcut to use it again.
+
+          This first release is unsigned, so Windows may show an unknown-publisher warning. SHA256SUMS.txt contains the download checksum.
+          '@ | Set-Content -LiteralPath dist/RELEASE_NOTES.md -Encoding utf8
+          gh release create "v$version" $installer.FullName dist/SHA256SUMS.txt --draft --target $env:GITHUB_SHA --title "Clawlinder $version - Windows installer" --notes-file dist/RELEASE_NOTES.md
+          if ($LASTEXITCODE -ne 0) { throw 'Could not create the draft release.' }
